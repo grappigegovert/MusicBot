@@ -472,8 +472,8 @@ class MusicBot(discord.Client):
         try:
             msg = await self.send_message(dest, content, tts=tts)
 
-            if msg and expire_in:
-                asyncio.ensure_future(self._wait_delete_msg(msg, expire_in))
+            #if msg and expire_in:
+            #    asyncio.ensure_future(self._wait_delete_msg(msg, expire_in))
 
             if also_delete and isinstance(also_delete, discord.Message):
                 asyncio.ensure_future(self._wait_delete_msg(also_delete, expire_in))
@@ -1032,7 +1032,7 @@ class MusicBot(discord.Client):
 
             reply_text %= (btext, position, time_until)
 
-        return Response(reply_text, delete_after=30)
+        return Response(reply_text, delete_after=0)
 
     async def _cmd_play_playlist_async(self, player, channel, author, permissions, playlist_url, extractor_type):
         """
