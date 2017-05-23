@@ -8,6 +8,7 @@ import aiohttp
 import discord
 import asyncio
 import traceback
+import pip
 
 from discord import utils
 from discord.object import Object
@@ -1811,6 +1812,19 @@ class MusicBot(discord.Client):
         await self.safe_send_message(channel, ":wave:")
         await self.disconnect_all_voice_clients()
         raise exceptions.TerminateSignal
+    
+    async def cmd_update(self, channel):
+        """
+        Usage:
+            {command_prefix}update
+
+        Updates the youtube-dl dependency via pip.
+        A restart is recommended afterwards.
+        """
+
+        await self.safe_send_message(channel, "Updating, please wait...")
+        pip.main(['install', '--upgrade', 'youtube-dl'])
+        await self.safe_send_message(channel, "Updated! :tada:")
 
     async def on_message(self, message):
         await self.wait_until_ready()
