@@ -9,6 +9,7 @@ import discord
 import asyncio
 import traceback
 import pip
+import urllib
 
 from discord import utils
 from discord.object import Object
@@ -719,6 +720,7 @@ class MusicBot(discord.Client):
                 print("Owner not found in a voice channel, could not autosummon.")
 
         print()
+        await self.safe_send_message(channel, "Sup bitches")
         # t-t-th-th-that's all folks!
 
     async def cmd_help(self, command=None):
@@ -1825,6 +1827,23 @@ class MusicBot(discord.Client):
         await self.safe_send_message(channel, "Updating, please wait...")
         pip.main(['install', '--upgrade', 'youtube-dl'])
         await self.safe_send_message(channel, "Updated! :tada:")
+
+    async def cmd_updatebot(self, channel):
+        """
+        Usage:
+            {command_prefix}updatebot
+
+        Updates the musicbot from Grappi's repo.
+        The bot is automatically restarted.
+        """
+
+        updateurl = "https://raw.githubusercontent.com/grappigegovert/MusicBot/master/musicbot/bot.py"
+
+        await self.safe_send_message(channel, "Downloading update...")
+        urllib.request.urlretrieve(updateurl, os.path.realpath(__file__))
+        await self.safe_send_message(channel, "Later faggots :tbc1::tbc2::tbc3::tbc4:")
+        await self.disconnect_all_voice_clients()
+        raise exceptions.RestartSignal
 
     async def on_message(self, message):
         await self.wait_until_ready()

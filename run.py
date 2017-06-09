@@ -101,44 +101,46 @@ class PIP(object):
         except:
             pass
 
+def restart():
+    pycom = None
+
+    if sys.platform.startswith('win'):
+        try:
+            subprocess.check_output('py -3.5 -c "exit()"', shell=True)
+            pycom = 'py -3.5'
+        except:
+
+            try:
+                subprocess.check_output('python3 -c "exit()"', shell=True)
+                pycom = 'python3'
+            except:
+                pass
+
+        if pycom:
+            print("Python 3 found.  Launching bot...")
+            os.system('start cmd /c %s run.py' % pycom)
+            sys.exit(0)
+    else:
+        try:
+            pycom = subprocess.check_output(['which', 'python3.5']).strip().decode()
+        except:
+            pass
+
+        if pycom:
+            print("\nPython 3 found.  Re-launching bot using: ")
+            print("  %s run.py\n" % pycom)
+
+            os.execlp(pycom, pycom, 'run.py')
+
 
 def main():
     if not sys.version_info >= (3, 5):
         print("Python 3.5+ is required. This version is %s" % sys.version.split()[0])
         print("Attempting to locate python 3.5...")
 
-        pycom = None
-
         # Maybe I should check for if the current dir is the musicbot folder, just in case
 
-        if sys.platform.startswith('win'):
-            try:
-                subprocess.check_output('py -3.5 -c "exit()"', shell=True)
-                pycom = 'py -3.5'
-            except:
-
-                try:
-                    subprocess.check_output('python3 -c "exit()"', shell=True)
-                    pycom = 'python3'
-                except:
-                    pass
-
-            if pycom:
-                print("Python 3 found.  Launching bot...")
-                os.system('start cmd /k %s run.py' % pycom)
-                sys.exit(0)
-
-        else:
-            try:
-                pycom = subprocess.check_output(['which', 'python3.5']).strip().decode()
-            except:
-                pass
-
-            if pycom:
-                print("\nPython 3 found.  Re-launching bot using: ")
-                print("  %s run.py\n" % pycom)
-
-                os.execlp(pycom, pycom, 'run.py')
+        restart()
 
         print("Please run the bot using python 3.5")
         input("Press enter to continue . . .")
@@ -219,6 +221,7 @@ def main():
             print("Restarting in {} seconds...".format(loops*2))
             time.sleep(sleeptime)
 
+        restart()
 
 if __name__ == '__main__':
     main()
