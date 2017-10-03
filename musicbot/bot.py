@@ -720,7 +720,6 @@ class MusicBot(discord.Client):
                 print("Owner not found in a voice channel, could not autosummon.")
 
         print()
-        await self.safe_send_message(self.get_channel(271364734673092618), "Sup bitches")
         # t-t-th-th-that's all folks!
 
     async def cmd_help(self, command=None):
@@ -1825,7 +1824,7 @@ class MusicBot(discord.Client):
         """
 
         await self.safe_send_message(channel, "Updating, please wait...")
-        pip.main(['install', '--upgrade', 'youtube-dl'])
+        pip.main(['install', '--upgrade', 'user', 'youtube-dl'])
         await self.safe_send_message(channel, "Updated! :tada:")
 
     async def cmd_updatebot(self, channel):
