@@ -221,7 +221,5 @@ def main():
             print("Restarting in {} seconds...".format(loops*2))
             time.sleep(sleeptime)
 
-        restart()
-
 if __name__ == '__main__':
     main()
