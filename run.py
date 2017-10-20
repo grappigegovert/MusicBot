@@ -202,6 +202,9 @@ def main():
 
                 elif e.__class__.__name__ == "RestartSignal":
                     loops = -1
+
+                elif e.__class__.__name__ == "RebootSignal":
+                    restart();
             else:
                 traceback.print_exc()
 

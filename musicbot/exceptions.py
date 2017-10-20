@@ -83,6 +83,10 @@ class Signal(Exception):
 class RestartSignal(Signal):
     pass
 
+# signal to reboot the bot completely
+class RebootSignal(Signal):
+    pass
+
 # signal to end the bot "gracefully"
 class TerminateSignal(Signal):
     pass

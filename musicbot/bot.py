@@ -1840,9 +1840,9 @@ class MusicBot(discord.Client):
 
         await self.safe_send_message(channel, "Downloading update...")
         urllib.request.urlretrieve(updateurl, os.path.realpath(__file__))
-        await self.safe_send_message(channel, "Later faggots :tbc1::tbc2::tbc3::tbc4:")
+        await self.safe_send_message(channel, "Later dudes <:uitgegleden:368146306142568459>")
         await self.disconnect_all_voice_clients()
-        raise exceptions.RestartSignal
+        raise exceptions.RebootSignal
 
     async def on_message(self, message):
         await self.wait_until_ready()
