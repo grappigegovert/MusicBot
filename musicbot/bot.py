@@ -1824,7 +1824,7 @@ class MusicBot(discord.Client):
         """
 
         await self.safe_send_message(channel, "Updating, please wait...")
-        pip.main(['install', '--upgrade', 'user', 'youtube-dl'])
+        pip.main(['install', '--upgrade', '--user', 'youtube-dl'])
         await self.safe_send_message(channel, "Updated! :tada:")
 
     async def cmd_updatebot(self, channel):
