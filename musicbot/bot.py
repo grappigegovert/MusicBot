@@ -23,6 +23,7 @@ from textwrap import dedent
 from datetime import timedelta
 from random import choice, shuffle
 from collections import defaultdict
+from datetime import datetime
 
 from musicbot.playlist import Playlist
 from musicbot.player import MusicPlayer
@@ -80,6 +81,7 @@ class MusicBot(discord.Client):
         self.blacklist = set(load_file(self.config.blacklist_file))
         self.autoplaylist = load_file(self.config.auto_playlist_file)
         self.downloader = downloader.Downloader(download_folder='audio_cache')
+        self.starttime = datetime.now()
 
         self.exit_signal = None
         self.init_ok = False
@@ -1843,6 +1845,16 @@ class MusicBot(discord.Client):
         await self.safe_send_message(channel, "Later dudes <:uitgegleden:368146306142568459>")
         await self.disconnect_all_voice_clients()
         raise exceptions.RebootSignal
+
+    async def cmd_info(self, channel):
+        """
+        Usage:
+            {command_prefix}info
+
+        Shows some info for the bot.
+        """
+
+        await self.safe_send_message(channel, "Bot info:\n---------------------------------\n🕐 Uptime: " + str(datetime.now() - self.starttime))
 
     async def on_message(self, message):
         await self.wait_until_ready()
