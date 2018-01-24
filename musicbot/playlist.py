@@ -298,6 +298,10 @@ class Playlist(EventEmitter, Serializable):
     def remove_entry(self, index):
         del self.entries[index]
 
+    def rotate_queue(self):
+        self.entries.rotate(1)
+        return self.entries[0]
+
     async def get_next_entry(self, predownload_next=True):
         """
             A coroutine which will return the next song or None if no songs left to play.

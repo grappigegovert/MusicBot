@@ -2374,6 +2374,38 @@ class MusicBot(discord.Client):
 
         await self.safe_send_message(channel, "Bot info:\n---------------------------------\n🕐 Uptime: " + str(datetime.now() - self.starttime))
 
+    async def cmd_playnext(self, player, channel, author, permissions, leftover_args, song_url):
+        """
+        Usage:
+            {command_prefix}playnext song_link
+            {command_prefix}playnext text to search for
+
+        Adds the song to the top of the playlist.  If a link is not provided, the first
+        result from a youtube search is added.
+        """
+
+        numsongs = len(player.playlist.entries)
+        result = await self.cmd_play(player, channel, author, permissions, leftover_args, song_url)
+        if len(player.playlist.entries) != numsongs:
+            entry = player.playlist.rotate_queue()
+            reply_text = "Enqueued **%s** to be played. Position in queue: %s"
+            position = 1
+            btext = entry.title
+
+            if player.is_stopped:
+                reply_text %= (btext, 'Up next!')
+            else:
+                try:
+                    time_until = await player.playlist.estimate_time_until(position, player)
+                    reply_text += ' - estimated time until playing: %s'
+                except:
+                    traceback.print_exc()
+                    time_until = ''
+
+                reply_text %= (btext, 'Up next!', ftimedelta(time_until))
+            return Response(reply_text, delete_after=0)
+        return result
+
     @dev_only
     async def cmd_breakpoint(self, message):
         log.critical("Activating debug breakpoint")
