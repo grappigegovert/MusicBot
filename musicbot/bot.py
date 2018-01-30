@@ -2340,29 +2340,27 @@ class MusicBot(discord.Client):
             {command_prefix}update
 
         Updates the youtube-dl dependency via pip.
-        A restart is recommended afterwards.
+        Call !reboot afterwards.
         """
 
         await self.safe_send_message(channel, "Updating, please wait...")
         pip.main(['install', '--upgrade', '--user', 'youtube-dl'])
         await self.safe_send_message(channel, "Updated! :tada:")
 
-    async def cmd_updatebot(self, channel):
+    async def cmd_updatebot(self, channel, file="musicbot/bot.py"):
         """
         Usage:
-            {command_prefix}updatebot
+            {command_prefix}updatebot [file]
 
         Updates the musicbot from Grappi's repo.
-        The bot is automatically restarted.
+        Call !reboot afterwards.
         """
 
-        updateurl = "https://raw.githubusercontent.com/grappigegovert/MusicBot/master/musicbot/bot.py"
+        updateurl = "https://raw.githubusercontent.com/grappigegovert/MusicBot/master/" + file
 
         await self.safe_send_message(channel, "Downloading update...")
-        urllib.request.urlretrieve(updateurl, os.path.realpath(__file__))
-        await self.safe_send_message(channel, "Later dudes <:uitgegleden:368146306142568459>")
-        await self.disconnect_all_voice_clients()
-        raise exceptions.RebootSignal()
+        urllib.request.urlretrieve(updateurl, os.path.split(os.path.realpath(__file__))[0] + "\\..\\" + file)
+        await self.safe_send_message(channel, "Updated " + file + " 👍")
 
     async def cmd_info(self, channel):
         """
@@ -2372,7 +2370,19 @@ class MusicBot(discord.Client):
         Shows some info for the bot.
         """
 
-        await self.safe_send_message(channel, "Bot info:\n---------------------------------\n🕐 Uptime: " + str(datetime.now() - self.starttime))
+        await self.safe_send_message(channel, "Bot info:\n---------------------------------\n🕐 Uptime: " + str(datetime.now() - self.starttime) + "\n📁 Bot dir: " + os.path.realpath(__file__))
+
+    async def cmd_reboot(self, channel):
+        """
+        Usage:
+            {command_prefix}reboot
+
+        Hard reset the bot.
+        """
+
+        await self.safe_send_message(channel, "Later dudes <:uitgegleden:368146306142568459>")
+        await self.disconnect_all_voice_clients()
+        raise exceptions.RebootSignal()
 
     async def cmd_playnext(self, player, channel, author, permissions, leftover_args, song_url):
         """
