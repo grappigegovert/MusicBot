@@ -1948,6 +1948,7 @@ class MusicBot(discord.Client):
         """
         Usage:
             {command_prefix}remove [number]
+            {command_prefix}remove [from]-[to]
 	    
         Removes a song from the queue at the given position, where the position is a number from {command_prefix}queue.
         """
@@ -1959,7 +1960,14 @@ class MusicBot(discord.Client):
             index = int(index)
 
         except ValueError:
-            raise exceptions.CommandError('{} is not a valid number.'.format(index), expire_in=20)
+            try:
+                nums = index.split("-")
+                if (len(nums) != 2):
+                    raise exceptions.ValueError
+                return self.removerange(player, int(nums[0]), int(nums[1]))
+            except ValueError:
+                pass
+            raise exceptions.CommandError('{} is not a valid number or range.'.format(index), expire_in=20)
 
         if 0 < index <= len(player.playlist.entries):
             try:
@@ -1973,6 +1981,15 @@ class MusicBot(discord.Client):
 
         else:
             raise exceptions.CommandError("You can't remove the current song (skip it instead), or a song in a position that doesn't exist.", expire_in=20)
+
+    def removerange(self, player, start, end):
+        if 0 < start <= end <= len(player.playlist.entries):
+            player.playlist.remove_entries(start-1, end)
+
+            return Response("\N{CHECK MARK} removed **" + str(end-start+1) + "** entries", delete_after=20)
+
+        else:
+             raise exceptions.CommandError("You can't remove the current song (skip it instead), or a song in a range that doesn't exist.", expire_in=20)
 
     async def cmd_volume(self, message, player, new_volume=None):
         """

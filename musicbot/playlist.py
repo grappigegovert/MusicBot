@@ -297,6 +297,10 @@ class Playlist(EventEmitter, Serializable):
 
     def remove_entry(self, index):
         del self.entries[index]
+    
+    def remove_entries(self, start, end):
+        for i in range(start, end):
+            del self.entries[start]
 
     def rotate_queue(self):
         self.entries.rotate(1)
