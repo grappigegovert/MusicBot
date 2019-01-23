@@ -393,7 +393,8 @@ def main():
                     loops = -1
 
                 elif e.__class__.__name__ == "RebootSignal":
-                    restart();
+                    restart()
+                    break
             else:
                 log.exception("Error starting bot")
 

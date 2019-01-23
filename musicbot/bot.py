@@ -1963,7 +1963,7 @@ class MusicBot(discord.Client):
             try:
                 nums = index.split("-")
                 if (len(nums) != 2):
-                    raise exceptions.ValueError
+                    raise ValueError
                 return self.removerange(player, int(nums[0]), int(nums[1]))
             except ValueError:
                 pass
@@ -2397,8 +2397,8 @@ class MusicBot(discord.Client):
         Hard reset the bot.
         """
 
-        await self.safe_send_message(channel, "Later dudes <:uitgegleden:368146306142568459>")
-        await self.disconnect_all_voice_clients()
+        asyncio.wait_for(asyncio.ensure_future(self.safe_send_message(channel, "Later dudes <:uitgegleden:368146306142568459>")), timeout=5)
+        asyncio.wait_for(asyncio.ensure_future(self.disconnect_all_voice_clients()), timeout=5)
         raise exceptions.RebootSignal()
 
     async def cmd_playnext(self, player, channel, author, permissions, leftover_args, song_url):
