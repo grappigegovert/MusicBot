@@ -2376,7 +2376,7 @@ class MusicBot(discord.Client):
         updateurl = "https://raw.githubusercontent.com/grappigegovert/MusicBot/master/" + file
 
         await self.safe_send_message(channel, "Downloading update...")
-        urllib.request.urlretrieve(updateurl, os.path.split(os.path.realpath(__file__))[0] + "\\..\\" + file)
+        urllib.request.urlretrieve(updateurl, os.path.join(os.path.split(os.path.realpath(__file__))[0], "..", file))
         await self.safe_send_message(channel, "Updated " + file + " 👍")
 
     async def cmd_info(self, channel):
