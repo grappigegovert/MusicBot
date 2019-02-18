@@ -2440,6 +2440,50 @@ class MusicBot(discord.Client):
             return Response(reply_text, delete_after=0)
         return result
 
+    async def cmd_localrandom(self, player, channel, author, permissions, leftover_args, numsongs=1):
+        """
+        Usage:
+            {command_prefix}localrandom
+            {command_prefix}localrandom [number of songs]
+
+        Adds a single or multple random song(s) from the bot's cache to the queue.
+        """
+        dlfolder = player.playlist.downloader.download_folder
+        files = os.listdir(dlfolder)
+        entries = set()
+        position = None
+        numsongs = int(numsongs)
+
+        for i in range(numsongs):
+            index = random.randint(0, len(files)-1)
+            path = os.path.join(dlfolder, files[index])
+            entry, pos = await player.playlist.add_local_entry(path, channel=channel, author=author)
+            entries.add(entry)
+            if position == None:
+                position = pos
+
+
+        if numsongs > 1:
+            reply_text = "Enqueued **%s** songs to be played. Position in queue: %s"
+            btext = numsongs
+        else:
+            reply_text = "Enqueued ||**%s**|| to be played. Position in queue: %s"
+            btext = entry.title
+
+        if position == 1 and player.is_stopped:
+            position = 'Up next!'
+            reply_text %= (btext, position)
+        else:
+            try:
+                time_until = await player.playlist.estimate_time_until(position, player)
+                reply_text += ' - estimated time until playing: %s'
+            except:
+                traceback.print_exc()
+                time_until = ''
+            reply_text %= (btext, position, ftimedelta(time_until))
+
+        return Response(reply_text, delete_after=0)
+
     @dev_only
     async def cmd_breakpoint(self, message):
         log.critical("Activating debug breakpoint")

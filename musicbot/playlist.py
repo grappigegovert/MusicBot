@@ -12,7 +12,7 @@ from youtube_dl.utils import ExtractorError, DownloadError, UnsupportedError
 from .utils import get_header
 from .constructs import Serializable
 from .lib.event_emitter import EventEmitter
-from .entry import URLPlaylistEntry, StreamPlaylistEntry
+from .entry import URLPlaylistEntry, StreamPlaylistEntry, LocalPlaylistEntry
 from .exceptions import ExtractionError, WrongEntryTypeError
 
 log = logging.getLogger(__name__)
@@ -143,6 +143,15 @@ class Playlist(EventEmitter, Serializable):
             song_url,
             title,
             destination = dest_url,
+            **meta
+        )
+        self._add_entry(entry)
+        return entry, len(self.entries)
+
+    async def add_local_entry(self, filepath, **meta):
+        entry = LocalPlaylistEntry(
+            self,
+            filepath,
             **meta
         )
         self._add_entry(entry)
@@ -340,7 +349,7 @@ class Playlist(EventEmitter, Serializable):
 
         # When the player plays a song, it eats the first playlist item, so we just have to add the time back
         if not player.is_stopped and player.current_entry:
-            estimated_time += player.current_entry.duration - player.progress
+            estimated_time += max(player.current_entry.duration - player.progress, 0)
 
         return datetime.timedelta(seconds=estimated_time)
 

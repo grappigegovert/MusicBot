@@ -2,8 +2,12 @@ import os
 import asyncio
 import logging
 import traceback
+import re
+
+import mutagen
 
 from enum import Enum
+from pathlib import Path
 from .constructs import Serializable
 from .exceptions import ExtractionError
 from .utils import get_header, md5sum
@@ -322,3 +326,66 @@ class StreamPlaylistEntry(BasePlaylistEntry):
             # although maybe that should be at a slightly lower level
         finally:
             self._is_downloading = False
+
+def clean(inputstr):
+    return inputstr.replace("*", "\\*").replace("_","\\_").replace("|","\\|")
+
+class LocalPlaylistEntry(BasePlaylistEntry):
+    def __init__(self, playlist, filename, duration=0, **meta):
+        super().__init__()
+
+        self.playlist = playlist
+        self.url = clean(filename)
+        self.title = clean(re.sub("(?:(?:(?!youtube)[^-]+)-[^-]+|(?:youtube-[0-9A-Za-z_-]{10}[048AEIMQUYcgkosw]))-(.*)", "\\1", Path(filename).stem).replace("_"," "))
+        self.destination = filename
+        if duration == 0:
+            try:
+                self.duration = mutagen.File(filename).info.length
+            except AttributeError:
+                self.duration = 1
+        else:
+            self.duration = duration
+        self.meta = meta
+        self.filename = filename
+
+    def __json__(self):
+        return self._enclose_json({
+            'version': 1,
+            'filename': self.filename,
+            'duration': self.duration,
+            'meta': {
+                name: {
+                    'type': obj.__class__.__name__,
+                    'id': obj.id,
+                    'name': obj.name
+                } for name, obj in self.meta.items() if obj
+            }
+        })
+
+    @classmethod
+    def _deserialize(cls, data, playlist=None):
+        assert playlist is not None, cls._bad('playlist')
+
+        try:
+            # TODO: version check
+            filename = data['filename']
+            duration = data['duration']
+            meta = {}
+
+            # TODO: Better [name] fallbacks
+            if 'channel' in data['meta']:
+                ch = playlist.bot.get_channel(data['meta']['channel']['id'])
+                meta['channel'] = ch or data['meta']['channel']['name']
+
+            if 'author' in data['meta']:
+                meta['author'] = meta['channel'].server.get_member(data['meta']['author']['id'])
+
+            entry = cls(playlist, filename, duration=duration, **meta)
+
+            return entry
+        except Exception as e:
+            log.error("Could not load {}".format(cls.__name__), exc_info=e)
+
+    # noinspection PyMethodOverriding
+    async def _download(self, *, fallback=False):
+        pass
