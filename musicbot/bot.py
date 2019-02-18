@@ -2397,8 +2397,15 @@ class MusicBot(discord.Client):
         Hard reset the bot.
         """
 
-        asyncio.wait_for(asyncio.ensure_future(self.safe_send_message(channel, "Later dudes <:uitgegleden:368146306142568459>")), timeout=5)
-        asyncio.wait_for(asyncio.ensure_future(self.disconnect_all_voice_clients()), timeout=5)
+        try:
+            asyncio.wait_for(asyncio.ensure_future(self.safe_send_message(channel, "Later dudes <:uitgegleden:368146306142568459>")), timeout=2)
+        except:
+            pass
+
+        try:
+            asyncio.wait_for(asyncio.ensure_future(self.disconnect_all_voice_clients()), timeout=2)
+        except:
+            pass
         raise exceptions.RebootSignal()
 
     async def cmd_playnext(self, player, channel, author, permissions, leftover_args, song_url):
