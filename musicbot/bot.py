@@ -190,7 +190,7 @@ class MusicBot(discord.Client):
         shandler.setFormatter(colorlog.LevelFormatter(
             fmt = {
                 'DEBUG': '{log_color}[{levelname}:{module}] {message}',
-                'INFO': '{log_color}{message}',
+                'INFO': '[{asctime}] {log_color}{message}',
                 'WARNING': '{log_color}{levelname}: {message}',
                 'ERROR': '{log_color}[{levelname}:{module}] {message}',
                 'CRITICAL': '{log_color}[{levelname}:{module}] {message}',
@@ -213,7 +213,7 @@ class MusicBot(discord.Client):
                 'VOICEDEBUG': 'purple',
         },
             style = '{',
-            datefmt = ''
+            datefmt = '%H:%M:%S'
         ))
         shandler.setLevel(self.config.debug_level)
         logging.getLogger(__package__).addHandler(shandler)
