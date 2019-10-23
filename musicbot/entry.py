@@ -220,9 +220,11 @@ class URLPlaylistEntry(BasePlaylistEntry):
     # noinspection PyShadowingBuiltins
     async def _really_download(self, *, hash=False):
         log.info("Download started: {}".format(self.url))
+        list = ['']
+        extrainfo = {'outputfilename' : list}
 
         try:
-            result = await self.playlist.downloader.extract_info(self.playlist.loop, self.url, download=True)
+            result = await self.playlist.downloader.extract_info(self.playlist.loop, self.url, download=True, extra_info=extrainfo)
         except Exception as e:
             raise ExtractionError(e)
 
@@ -233,7 +235,7 @@ class URLPlaylistEntry(BasePlaylistEntry):
             raise ExtractionError("ytdl broke and hell if I know why")
             # What the fuck do I do now?
 
-        self.filename = unhashed_fname = self.playlist.downloader.ytdl.prepare_filename(result)
+        self.filename = unhashed_fname = result['outputfilename'][0]
 
         if hash:
             # insert the 8 last characters of the file hash to the file name to ensure uniqueness

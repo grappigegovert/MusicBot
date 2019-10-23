@@ -4,12 +4,16 @@ import logging
 import functools
 import youtube_dl
 
+from .outputfilenamePP import OutputFilenamePP
 from concurrent.futures import ThreadPoolExecutor
 
 log = logging.getLogger(__name__)
 
 ytdl_format_options = {
     'format': 'bestaudio/best',
+    'postprocessors': [{
+        'key': 'FFmpegExtractAudio'
+    }],
     'outtmpl': '%(extractor)s-%(id)s-%(title)s.%(ext)s',
     'restrictfilenames': True,
     'noplaylist': True,
@@ -49,6 +53,8 @@ class Downloader:
             otmpl = self.safe_ytdl.params['outtmpl']
             self.safe_ytdl.params['outtmpl'] = os.path.join(download_folder, otmpl)
 
+        self.unsafe_ytdl.add_post_processor(OutputFilenamePP())
+        self.safe_ytdl.add_post_processor(OutputFilenamePP())
 
     @property
     def ytdl(self):
