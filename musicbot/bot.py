@@ -2459,7 +2459,13 @@ class MusicBot(discord.Client):
         files = os.listdir(dlfolder)
         entries = set()
         position = None
-        numsongs = int(numsongs)
+        try:
+            numsongs = int(numsongs)
+        except ValueError:
+            raise exceptions.CommandError("'%s' is not a valid number" % numsongs, expire_in=20)
+
+        if numsongs > 100:
+            raise exceptions.CommandError("fuck off", expire_in=20)
 
         for i in range(numsongs):
             index = random.randint(0, len(files)-1)
