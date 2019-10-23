@@ -443,7 +443,8 @@ def check_stderr(data:bytes):
         "Application provided invalid, non monotonically increasing dts to muxer in stream",
         "Last message repeated",
         "Failed to send close message",
-        "decode_band_types: Input buffer exhausted before END element found"
+        "decode_band_types: Input buffer exhausted before END element found",
+        "] overread, skip "
     ]
     errors = [
         "Invalid data found when processing input", # need to regex this properly, its both a warning and an error
