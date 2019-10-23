@@ -2051,8 +2051,8 @@ class MusicBot(discord.Client):
         """
 
         lines = []
-        unlisted = 0
-        andmoretext = '* ... and %s more*' % ('x' * len(player.playlist.entries))
+        numentries = len(player.playlist.entries)
+        andmoretext = '* ... and %s more*' % numentries
 
         if player.current_entry:
             # TODO: Fix timedelta garbage with util function
@@ -2066,6 +2066,7 @@ class MusicBot(discord.Client):
             else:
                 lines.append("Now Playing: **%s** %s\n" % (player.current_entry.title, prog_str))
 
+        i = 1 # hmm
         for i, item in enumerate(player.playlist, 1):
             if item.meta.get('channel', False) and item.meta.get('author', False):
                 nextline = '`{}.` **{}** added by **{}**'.format(i, item.title, item.meta['author'].name).strip()
@@ -2075,14 +2076,12 @@ class MusicBot(discord.Client):
             currentlinesum = sum(len(x) + 1 for x in lines)  # +1 is for newline char
 
             if currentlinesum + len(nextline) + len(andmoretext) > DISCORD_MSG_CHAR_LIMIT:
-                if currentlinesum + len(andmoretext):
-                    unlisted += 1
-                    continue
+                break
 
             lines.append(nextline)
 
-        if unlisted:
-            lines.append('\n*... and %s more*' % unlisted)
+        if i < numentries:
+            lines.append("\n*... and {} more*".format(numentries - i + 1))
 
         if not lines:
             lines.append(
