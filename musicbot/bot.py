@@ -140,6 +140,14 @@ class MusicBot(discord.Client):
 
         wrapper.dev_cmd = True
         return wrapper
+    
+    def hidden_command(func):
+        @wraps(func)
+        async def wrapper(self, *args, **kwargs):
+            return await func(self, *args, **kwargs)
+        
+        wrapper.hidden_cmd = True
+        return wrapper
 
     def ensure_appinfo(func):
         @wraps(func)
@@ -1170,7 +1178,7 @@ class MusicBot(discord.Client):
             commands = []
 
             for att in dir(self):
-                if att.startswith('cmd_') and att != 'cmd_help' and not hasattr(getattr(self, att), 'dev_cmd'):
+                if att.startswith('cmd_') and att != 'cmd_help' and not hasattr(getattr(self, att), 'dev_cmd') and not hasattr(getattr(self, att), 'hidden_cmd'):
                     command_name = att.replace('cmd_', '').lower()
                     commands.append("{}{}".format(self.config.command_prefix, command_name))
 
@@ -2483,6 +2491,10 @@ class MusicBot(discord.Client):
             reply_text %= (btext, position, ftimedelta(time_until))
 
         return Response(reply_text, delete_after=0)
+
+    @hidden_command
+    async def cmd_que(self, channel):
+        return Response("¿Qué?", delete_after=20)
 
     @dev_only
     async def cmd_breakpoint(self, message):
