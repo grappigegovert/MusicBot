@@ -6,6 +6,7 @@ from random import shuffle
 from itertools import islice
 from collections import deque
 
+from concurrent.futures import ThreadPoolExecutor
 from urllib.error import URLError
 from youtube_dl.utils import ExtractorError, DownloadError, UnsupportedError
 
@@ -28,6 +29,7 @@ class Playlist(EventEmitter, Serializable):
         self.bot = bot
         self.loop = bot.loop
         self.downloader = bot.downloader
+        self.thread_pool = ThreadPoolExecutor(max_workers=60)
         self.entries = deque()
 
     def __iter__(self):
@@ -154,6 +156,7 @@ class Playlist(EventEmitter, Serializable):
             filepath,
             **meta
         )
+        await self.loop.run_in_executor(self.thread_pool, entry.fix_info)
         self._add_entry(entry)
         return entry, len(self.entries)
 

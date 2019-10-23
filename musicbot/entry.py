@@ -14,7 +14,6 @@ from .utils import get_header, md5sum
 
 log = logging.getLogger(__name__)
 
-
 class EntryTypes(Enum):
     URL = 1
     STEAM = 2
@@ -336,23 +335,26 @@ class LocalPlaylistEntry(BasePlaylistEntry):
 
         self.playlist = playlist
         self.url = clean(filename)
-        self.title = clean(re.sub("(?:(?:(?!youtube)[^-]+)-[^-]+|(?:youtube-[0-9A-Za-z_-]{10}[048AEIMQUYcgkosw]))-(.*)", "\\1", Path(filename).stem).replace("_"," "))
+        self.title = self.url
         self.destination = filename
-        if duration == 0:
-            try:
-                self.duration = mutagen.File(filename).info.length
-            except AttributeError:
-                self.duration = 1
-        else:
-            self.duration = duration
+        self.duration = duration
         self.meta = meta
         self.filename = filename
+
+    def fix_info(self):
+        self.title = clean(re.sub("(?:(?:(?!youtube)[^-]+)-[^-]+|(?:youtube-[0-9A-Za-z_-]{10}[048AEIMQUYcgkosw]))-(.*)", "\\1", Path(self.filename).stem).replace("_"," "))
+        if self.duration == 0:
+            try:
+                self.duration = mutagen.File(self.filename).info.length
+            except AttributeError:
+                self.duration = 1
 
     def __json__(self):
         return self._enclose_json({
             'version': 1,
             'filename': self.filename,
             'duration': self.duration,
+            'title': self.title,
             'meta': {
                 name: {
                     'type': obj.__class__.__name__,
@@ -370,6 +372,7 @@ class LocalPlaylistEntry(BasePlaylistEntry):
             # TODO: version check
             filename = data['filename']
             duration = data['duration']
+            title = data['title']
             meta = {}
 
             # TODO: Better [name] fallbacks
@@ -381,6 +384,7 @@ class LocalPlaylistEntry(BasePlaylistEntry):
                 meta['author'] = meta['channel'].server.get_member(data['meta']['author']['id'])
 
             entry = cls(playlist, filename, duration=duration, **meta)
+            entry.title = title
 
             return entry
         except Exception as e:
