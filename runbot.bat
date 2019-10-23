@@ -35,4 +35,3 @@ GOTO end
 ECHO ERROR: Python has either not been installed or not added to your PATH.
 
 :end
-PAUSE
