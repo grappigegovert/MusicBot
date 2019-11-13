@@ -99,6 +99,7 @@ class MusicPlayer(EventEmitter, Serializable):
         self.bot = bot
         self.loop = bot.loop
         self.voice_client = voice_client
+        self.server = voice_client.server
         self.playlist = playlist
         self.state = MusicPlayerState.STOPPED
         self.skip_state = None
@@ -324,7 +325,8 @@ class MusicPlayer(EventEmitter, Serializable):
                 await asyncio.sleep(3)
 
             except Exception:
-                log.error("Error in websocket check loop", exc_info=True)
+                log.error("Error in websocket check loop, disconnecting...", exc_info=True)
+                await self.bot.disconnect_voice_client(self.server)
 
             finally:
                 await asyncio.sleep(1)
