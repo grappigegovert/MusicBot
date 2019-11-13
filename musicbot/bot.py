@@ -2764,7 +2764,7 @@ class MusicBot(discord.Client):
         if not state.is_about_my_voice_channel:
             return # Irrelevant channel
 
-        if state.joining or state.leaving:
+        if state.joining or state.leaving or state.disconnecting:
             log.info("{0.id}/{0!s} has {1} {2}/{3}".format(
                 state.member,
                 'joined' if state.joining else 'left',
