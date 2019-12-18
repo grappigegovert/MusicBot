@@ -1,1 +1,0 @@
-https://github.com/Rapptz/discord.py/commit/8fdcb4de3b6dfd63c00bdd73583a63274f278998
