@@ -2780,24 +2780,33 @@ class MusicBot(discord.Client):
         auto_paused = self.server_specific_data[after.server]['auto_paused']
         player = await self.get_player(state.my_voice_channel)
 
-        if state.joining and state.empty() and player.is_playing:
-            log.info(autopause_msg.format(
-                state = "Pausing",
-                channel = state.my_voice_channel,
-                reason = "(joining empty channel)"
-            ).strip())
 
-            self.server_specific_data[after.server]['auto_paused'] = True
-            player.pause()
-            return
+        if state.is_about_me:
+            if state.joining and state.empty() and player.is_playing:
+                log.info(autopause_msg.format(
+                    state = "Pausing",
+                    channel = state.my_voice_channel,
+                    reason = "(joining empty channel)"
+                ).strip())
 
-        if not state.is_about_me:
+                self.server_specific_data[after.server]['auto_paused'] = True
+                player.pause()
+            elif state.joining and not state.empty() and auto_paused and player.is_paused:
+                log.info(autopause_msg.format(
+                        state = "Unpausing",
+                        channel = state.my_voice_channel,
+                        reason = "(joining non-empty channel)"
+                    ).strip())
+
+                self.server_specific_data[after.server]['auto_paused'] = False
+                player.resume()
+        else:
             if not state.empty(old_channel=state.leaving):
                 if auto_paused and player.is_paused:
                     log.info(autopause_msg.format(
                         state = "Unpausing",
                         channel = state.my_voice_channel,
-                        reason = ""
+                        reason = "(someone joined my channel)"
                     ).strip())
 
                     self.server_specific_data[after.server]['auto_paused'] = False
@@ -2807,7 +2816,7 @@ class MusicBot(discord.Client):
                     log.info(autopause_msg.format(
                         state = "Pausing",
                         channel = state.my_voice_channel,
-                        reason = "(empty channel)"
+                        reason = "(everyone left my channel)"
                     ).strip())
 
                     self.server_specific_data[after.server]['auto_paused'] = True
