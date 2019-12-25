@@ -319,14 +319,15 @@ class MusicPlayer(EventEmitter, Serializable):
             except InvalidState:
                 log.debug("Voice websocket for \"{}\" is {}, reconnecting".format(
                     self.voice_client.channel.server,
-                    self.voice_client.ws.state_name
+                    self.voice_client.ws.state.name
                 ))
                 await self.bot.reconnect_voice_client(self.voice_client.channel.server, channel=self.voice_client.channel)
                 await asyncio.sleep(3)
 
             except Exception:
                 log.error("Error in websocket check loop, disconnecting...", exc_info=True)
-                await self.bot.disconnect_voice_client(self.server)
+                if (self)
+                    await self.bot.disconnect_voice_client(self.server)
 
             finally:
                 await asyncio.sleep(1)
