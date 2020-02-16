@@ -2501,6 +2501,43 @@ class MusicBot(discord.Client):
     async def cmd_que(self, channel):
         return Response("¿Qué?", delete_after=20)
 
+    @owner_only
+    async def cmd_localplay(self, player, channel, author, permissions, leftover_args):
+        """
+        Usage:
+            {command_prefix}localplay <path>
+
+        Owner only.
+        Adds a single song from the specified path to the queue.
+        """
+
+        path = ' '.join(leftover_args)
+        localpath = os.path.join(player.playlist.downloader.download_folder, path)
+        if os.path.exists(localpath):
+            path = localpath
+        elif not os.path.exists(path):
+            log.info(path)
+            return Response("Specified path does not exist.", delete_after=20)
+
+
+        entry, pos = await player.playlist.add_local_entry(path, channel=channel, author=author)
+
+        reply_text = "Enqueued **%s** to be played. Position in queue: %s"
+        btext = entry.title
+        if pos == 1 and player.is_stopped:
+            pos = 'Up next!'
+            reply_text %= (btext, pos)
+        else:
+            try:
+                time_until = await player.playlist.estimate_time_until(pos, player)
+                reply_text += ' - estimated time until playing: %s'
+            except:
+                traceback.print_exc()
+                time_until = ''
+            reply_text %= (btext, pos, ftimedelta(time_until))
+
+        return Response(reply_text, delete_after=20)
+
     @dev_only
     async def cmd_breakpoint(self, message):
         log.critical("Activating debug breakpoint")
