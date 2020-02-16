@@ -13,6 +13,8 @@ ytdl_format_options = {
     'format': 'bestaudio/best',
     'postprocessors': [{
         'key': 'FFmpegExtractAudio'
+    },{
+        'key': 'FFmpegMetadata'
     }],
     'outtmpl': '%(extractor)s-%(id)s-%(title)s.%(ext)s',
     'restrictfilenames': True,

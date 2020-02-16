@@ -344,11 +344,16 @@ class LocalPlaylistEntry(BasePlaylistEntry):
         self.filename = filename
 
     def fix_info(self):
-        self.title = clean(re.sub("(?:(?:(?!youtube)[^-]+)-[^-]+|(?:youtube-[0-9A-Za-z_-]{10}[048AEIMQUYcgkosw]))-(.*)", "\\1", Path(self.filename).stem).replace("_"," "))
+        try:
+            m = mutagen.File(self.filename)
+            self.title = m.tags['title'][0]
+        except:
+            self.title = clean(re.sub("(?:(?:(?!youtube)[^-]+)-[^-]+|(?:youtube-[0-9A-Za-z_-]{10}[048AEIMQUYcgkosw]))-(.*)", "\\1", Path(self.filename).stem).replace("_"," "))
+
         if self.duration == 0:
             try:
-                self.duration = mutagen.File(self.filename).info.length
-            except AttributeError:
+                self.duration = m.info.length
+            except:
                 self.duration = 1
 
     def __json__(self):
