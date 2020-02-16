@@ -152,10 +152,10 @@ class URLPlaylistEntry(BasePlaylistEntry):
                 os.makedirs(self.download_folder)
 
             # self.expected_filename: audio_cache\youtube-9R8aSKwTEMg-NOMA_-_Brain_Power.m4a
-            extractor = os.path.basename(self.expected_filename).split('-')[0]
+            self.extractor = os.path.basename(self.expected_filename).split('-')[0]
 
             # the generic extractor requires special handling
-            if extractor == 'generic':
+            if self.extractor == 'generic':
                 flistdir = [f.rsplit('-', 1)[0] for f in os.listdir(self.download_folder)]
                 expected_fname_noex, fname_ex = os.path.basename(self.expected_filename).rsplit('.', 1)
 
@@ -224,7 +224,7 @@ class URLPlaylistEntry(BasePlaylistEntry):
         extrainfo = {'outputfilename' : list}
 
         try:
-            result = await self.playlist.downloader.extract_info(self.playlist.loop, self.url, download=True, extra_info=extrainfo)
+            result = await self.playlist.downloader.extract_info(self.playlist.loop, self.url, download=True, keepvideo=self.extractor=="generic", extra_info=extrainfo)
         except Exception as e:
             raise ExtractionError(e)
 

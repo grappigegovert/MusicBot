@@ -60,18 +60,22 @@ class Downloader:
     def ytdl(self):
         return self.safe_ytdl
 
-    async def extract_info(self, loop, *args, on_error=None, retry_on_error=False, **kwargs):
+    async def extract_info(self, loop, *args, on_error=None, retry_on_error=False, keepvideo=False, **kwargs):
         """
             Runs ytdl.extract_info within the threadpool. Returns a future that will fire when it's done.
             If `on_error` is passed and an exception is raised, the exception will be caught and passed to
             on_error as an argument.
         """
-        if callable(on_error):
-            try:
-                return await loop.run_in_executor(self.thread_pool, functools.partial(self.unsafe_ytdl.extract_info, *args, **kwargs))
+        if (keepvideo):
+            unsafe_extractaudio_pp = self.unsafe_ytdl._pps.pop(0)
 
-            except Exception as e:
+        try:
+            result = await loop.run_in_executor(self.thread_pool, functools.partial(self.unsafe_ytdl.extract_info, *args, **kwargs))
 
+        except Exception as e:
+            if (keepvideo):
+                self.unsafe_ytdl._pps.insert(0, unsafe_extractaudio_pp)
+            if callable(on_error):
                 # (youtube_dl.utils.ExtractorError, youtube_dl.utils.DownloadError)
                 # I hope I don't have to deal with ContentTooShortError's
                 if asyncio.iscoroutinefunction(on_error):
@@ -84,9 +88,14 @@ class Downloader:
                     loop.call_soon_threadsafe(on_error, e)
 
                 if retry_on_error:
-                    return await self.safe_extract_info(loop, *args, **kwargs)
+                    result = await self.safe_extract_info(loop, *args, **kwargs)
+            else:
+                raise
         else:
-            return await loop.run_in_executor(self.thread_pool, functools.partial(self.unsafe_ytdl.extract_info, *args, **kwargs))
+            if (keepvideo):
+                self.unsafe_ytdl._pps.insert(0, unsafe_extractaudio_pp)
+
+        return result
 
     async def safe_extract_info(self, loop, *args, **kwargs):
         return await loop.run_in_executor(self.thread_pool, functools.partial(self.safe_ytdl.extract_info, *args, **kwargs))
