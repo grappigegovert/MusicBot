@@ -607,7 +607,7 @@ class MusicBot(discord.Client):
         await self.serialize_queue(player.voice_client.channel.server)
 
         if self.config.write_current_song:
-            await self.write_current_song(player.voice_client.channel.server, entry)
+            await self.write_current_song(player.voice_client.channel.server, entry.title)
 
         channel = entry.meta.get('channel', None)
         author = entry.meta.get('author', None)
@@ -645,6 +645,8 @@ class MusicBot(discord.Client):
 
     async def on_player_stop(self, player, **_):
         await self.update_now_playing_status()
+        if self.config.write_current_song:
+            await self.write_current_song(player.voice_client.channel.server, "")
 
     async def on_player_finished_playing(self, player, **_):
         if not player.playlist.entries and not player.current_entry and self.config.auto_playlist:
@@ -820,7 +822,7 @@ class MusicBot(discord.Client):
 
         return MusicPlayer.from_json(data, self, voice_client, playlist)
 
-    async def write_current_song(self, server, entry, *, dir=None):
+    async def write_current_song(self, server, title, *, dir=None):
         """
         Writes the current song to file
         """
@@ -835,7 +837,7 @@ class MusicBot(discord.Client):
             log.debug("Writing current song for %s", server.id)
 
             with open(dir, 'w', encoding='utf8') as f:
-                f.write(entry.title)
+                f.write(title)
 
     @ensure_appinfo
     async def _on_ready_sanity_checks(self):
