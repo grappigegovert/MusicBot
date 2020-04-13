@@ -26,6 +26,7 @@ class EntryTypes(Enum):
 class BasePlaylistEntry(Serializable):
     def __init__(self):
         self.filename = None
+        self.title = None
         self._is_downloading = False
         self._waiting_futures = []
 
@@ -38,6 +39,16 @@ class BasePlaylistEntry(Serializable):
 
     async def _download(self):
         raise NotImplementedError
+
+    def get_clean_title(self):
+        """
+        Returns the title with all discord message formatting stripped.
+        """
+
+        if self.title is not None:
+            return self.title.replace("*", r"\*").replace("~", r"\~").replace("_", r"\_")
+        else:
+            return ""
 
     def get_ready_future(self):
         """

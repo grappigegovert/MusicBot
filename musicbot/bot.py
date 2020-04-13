@@ -624,10 +624,10 @@ class MusicBot(discord.Client):
 
             if self.config.now_playing_mentions:
                 newmsg = '%s - your song **%s** is now playing in %s!' % (
-                    entry.meta['author'].mention, entry.title, player.voice_client.channel.name)
+                    entry.meta['author'].mention, entry.get_clean_title(), player.voice_client.channel.name)
             else:
                 newmsg = 'Now playing in %s: **%s**' % (
-                    player.voice_client.channel.name, entry.title)
+                    player.voice_client.channel.name, entry.get_clean_title())
 
             if self.server_specific_data[channel.server]['last_np_msg']:
                 self.server_specific_data[channel.server]['last_np_msg'] = await self.safe_edit_message(last_np_msg, newmsg, send_if_fail=True)
@@ -1500,7 +1500,7 @@ class MusicBot(discord.Client):
                     return await self.cmd_play(player, channel, author, permissions, leftover_args, e.use_url)
 
                 reply_text = "Enqueued **%s** to be played. Position in queue: %s"
-                btext = entry.title
+                btext = entry.get_clean_title()
 
             if position == 1 and player.is_stopped:
                 position = 'Up next!'
@@ -2084,16 +2084,16 @@ class MusicBot(discord.Client):
 
             if player.current_entry.meta.get('channel', False) and player.current_entry.meta.get('author', False):
                 lines.append("Currently Playing: **%s** added by **%s** %s\n" % (
-                    player.current_entry.title, player.current_entry.meta['author'].name, prog_str))
+                    player.current_entry.get_clean_title(), player.current_entry.meta['author'].name, prog_str))
             else:
-                lines.append("Now Playing: **%s** %s\n" % (player.current_entry.title, prog_str))
+                lines.append("Now Playing: **%s** %s\n" % (player.current_entry.get_clean_title(), prog_str))
 
         i = 1 # hmm
         for i, item in enumerate(player.playlist, 1):
             if item.meta.get('channel', False) and item.meta.get('author', False):
-                nextline = '`{}.` **{}** added by **{}**'.format(i, item.title, item.meta['author'].name).strip()
+                nextline = '`{}.` **{}** added by **{}**'.format(i, item.get_clean_title(), item.meta['author'].name).strip()
             else:
-                nextline = '`{}.` **{}**'.format(i, item.title).strip()
+                nextline = '`{}.` **{}**'.format(i, item.get_clean_title()).strip()
 
             currentlinesum = sum(len(x) + 1 for x in lines)  # +1 is for newline char
 
@@ -2453,7 +2453,7 @@ class MusicBot(discord.Client):
             entry = player.playlist.rotate_queue()
             reply_text = "Enqueued **%s** to be played. Position in queue: %s"
             position = 1
-            btext = entry.title
+            btext = entry.get_clean_title()
 
             if player.is_stopped:
                 reply_text %= (btext, 'Up next!')
@@ -2503,7 +2503,7 @@ class MusicBot(discord.Client):
             btext = numsongs
         else:
             reply_text = "Enqueued ||**%s**|| to be played. Position in queue: %s"
-            btext = entry.title
+            btext = entry.get_clean_title()
 
         if position == 1 and player.is_stopped:
             position = 'Up next!'
@@ -2545,7 +2545,7 @@ class MusicBot(discord.Client):
         entry, pos = await player.playlist.add_local_entry(path, channel=channel, author=author)
 
         reply_text = "Enqueued **%s** to be played. Position in queue: %s"
-        btext = entry.title
+        btext = entry.get_clean_title()
         if pos == 1 and player.is_stopped:
             pos = 'Up next!'
             reply_text %= (btext, pos)
