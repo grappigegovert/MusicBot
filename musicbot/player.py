@@ -326,7 +326,7 @@ class MusicPlayer(EventEmitter, Serializable):
 
             except Exception:
                 log.error("Error in websocket check loop, disconnecting...", exc_info=True)
-                if (self)
+                if (self is not None):
                     await self.bot.disconnect_voice_client(self.server)
 
             finally:

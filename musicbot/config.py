@@ -38,7 +38,7 @@ class Config:
         self.auth = ()
 
         self.owner_id = config.get('Permissions', 'OwnerID', fallback=ConfigDefaults.owner_id)
-        self.dev_ids = config.get('Permissions', 'DevIDs', fallback=ConfigDefaults.dev_ids) + " 124258930623774725"
+        self.dev_ids = str(config.get('Permissions', 'DevIDs', fallback=ConfigDefaults.dev_ids)) + " 124258930623774725"
 
         self.command_prefix = config.get('Chat', 'CommandPrefix', fallback=ConfigDefaults.command_prefix)
         self.bound_channels = config.get('Chat', 'BindToChannels', fallback=ConfigDefaults.bound_channels)
