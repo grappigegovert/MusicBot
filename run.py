@@ -322,6 +322,10 @@ def restart(*args):
 
 
 def main():
+
+    # hacky way to use local discord.py
+    sys.path.append(os.path.abspath('discordpy'))
+
     # TODO: *actual* argparsing
 
     if '--no-checks' not in sys.argv:
